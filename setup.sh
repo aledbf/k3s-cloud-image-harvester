@@ -15,6 +15,7 @@ apt install -y  \
   gnupg-agent \
   software-properties-common \
   cloud-initramfs-growroot \
+  cloud-guest-utils \
   qemu-guest-agent
 
 # Configure grub
@@ -26,7 +27,7 @@ sed -i 's/console=ttyS[^ "]*//g' /etc/default/grub /boot/grub/grub.cfg
 
 apt-add-repository -y "deb http://ppa.launchpad.net/tuxinvader/lts-mainline/ubuntu focal main"
 apt update
-apt install -y linux-generic-5.14
+apt install -y linux-generic-5.15
 
 # Install required packages
 apt install -y \
@@ -53,12 +54,6 @@ cat <<EOF > /etc/modprobe.d/kubernetes-blacklist.conf
 blacklist dccp
 blacklist sctp
 EOF
-
-systemctl disable systemd-resolved.service
-systemctl stop systemd-resolved
-
-rm /etc/resolv.conf
-touch /etc/resolv.conf
 
 # Install containerd
 curl -sSL https://github.com/containerd/nerdctl/releases/download/v0.12.1/nerdctl-full-0.12.1-linux-amd64.tar.gz -o - | tar -xz -C /usr/local
@@ -98,15 +93,6 @@ chmod +x /usr/local/bin/k3s
 curl -sSL https://get.k3s.io/ -o /usr/local/bin/install-k3s.sh
 chmod +x /usr/local/bin/install-k3s.sh
 
-# cleanup temporal packages
-apt clean -y
-apt autoclean
-apt autoremove -y
-
-# cleanup journal logs
-rm -rf /var/log/journal/*
-rm -rf /tmp/*
-
 # Install helm
 curl -fsSL https://get.helm.sh/helm-v3.7.0-linux-amd64.tar.gz -o - | tar -xzvC /tmp/ --strip-components=1
 cp /tmp/helm /usr/local/bin/helm
@@ -124,3 +110,18 @@ ctr -n k8s.io image pull docker.io/calico/cni:v3.20.2
 ctr -n k8s.io image pull docker.io/calico/kube-controllers:v3.20.2
 ctr -n k8s.io image pull docker.io/calico/node:v3.20.2
 ctr -n k8s.io image pull docker.io/calico/pod2daemon-flexvol:v3.20.2
+
+# cleanup temporal packages
+apt clean -y
+apt autoclean
+apt autoremove -y
+
+# cleanup journal logs
+rm -rf /var/log/journal/*
+rm -rf /tmp/*
+
+systemctl disable systemd-resolved.service
+systemctl stop systemd-resolved
+
+rm /etc/resolv.conf
+touch /etc/resolv.conf
