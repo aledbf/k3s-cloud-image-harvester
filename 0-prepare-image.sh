@@ -34,5 +34,5 @@ virt-customize -a "${VM_IMAGE}" --run-command 'rm -rf /setup.sh /start-k3s.sh /e
 echo "freeing space..."
 virt-sparsify --in-place "${VM_IMAGE}"
 
-ewcho "compressing VM"
+echo "compressing VM"
 gzip "${VM_IMAGE}"

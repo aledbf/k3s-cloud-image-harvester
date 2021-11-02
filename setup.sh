@@ -106,10 +106,10 @@ mkdir -p /var/lib/rancher/k3s/server/manifests
 curl -sSL -o /var/lib/rancher/k3s/server/manifests/calico.yaml \
   https://docs.projectcalico.org/manifests/calico-vxlan.yaml
 
-ctr -n k8s.io image pull docker.io/calico/cni:v3.20.2
-ctr -n k8s.io image pull docker.io/calico/kube-controllers:v3.20.2
-ctr -n k8s.io image pull docker.io/calico/node:v3.20.2
-ctr -n k8s.io image pull docker.io/calico/pod2daemon-flexvol:v3.20.2
+/usr/local/bin/ctr -n k8s.io image pull docker.io/calico/cni:v3.20.2
+/usr/local/bin/ctr -n k8s.io image pull docker.io/calico/kube-controllers:v3.20.2
+/usr/local/bin/ctr -n k8s.io image pull docker.io/calico/node:v3.20.2
+/usr/local/bin/ctr -n k8s.io image pull docker.io/calico/pod2daemon-flexvol:v3.20.2
 
 # cleanup temporal packages
 apt clean -y
