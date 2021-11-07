@@ -56,7 +56,7 @@ blacklist sctp
 EOF
 
 # Install containerd
-curl -sSL https://github.com/containerd/nerdctl/releases/download/v0.12.1/nerdctl-full-0.12.1-linux-amd64.tar.gz -o - | tar -xz -C /usr/local
+curl -sSL https://github.com/containerd/nerdctl/releases/download/v0.13.0/nerdctl-full-0.13.0-linux-amd64.tar.gz -o - | tar -xz -C /usr/local
 
 mkdir -p /etc/containerd /etc/containerd/certs.d
 
@@ -76,9 +76,6 @@ mkdir -p /etc/containerd-stargz-grpc/
 # Start containerd and stargz
 systemctl enable containerd
 systemctl enable stargz-snapshotter
-
-systemctl start containerd
-systemctl start stargz-snapshotter
 
 # Download k3s tar file to improve initial start time and remove dependency of Internet connection
 mkdir -p /var/lib/rancher/k3s/agent/images/
@@ -106,6 +103,8 @@ mkdir -p /var/lib/rancher/k3s/server/manifests
 curl -sSL -o /var/lib/rancher/k3s/server/manifests/calico.yaml \
   https://docs.projectcalico.org/manifests/calico-vxlan.yaml
 
+/usr/local/bin/containerd &
+
 /usr/local/bin/ctr -n k8s.io image pull docker.io/calico/cni:v3.20.2
 /usr/local/bin/ctr -n k8s.io image pull docker.io/calico/kube-controllers:v3.20.2
 /usr/local/bin/ctr -n k8s.io image pull docker.io/calico/node:v3.20.2
@@ -125,3 +124,5 @@ systemctl stop systemd-resolved
 
 rm /etc/resolv.conf
 touch /etc/resolv.conf
+
+killall -9 containerd
