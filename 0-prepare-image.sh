@@ -14,10 +14,13 @@ cp "${CLOUD_IMAGE}" "${VM_IMAGE}"
 
 echo "increasing image disk size..."
 
-qemu-img create -f qcow2 moredisk.qcow2 20G
-virt-resize --expand /dev/sda1 "${VM_IMAGE}" moredisk.qcow2
-cp moredisk.qcow2 "${VM_IMAGE}"
-rm moredisk.qcow2
+qemu-img resize "${VM_IMAGE}" +20G
+
+"${SCRIPT_DIRECTORY}/1-start-vm.sh" &
+
+sleep 30
+
+killall -9 qemu-system-x86_64
 
 echo "customizing image..."
 virt-customize -a "${VM_IMAGE}" --firstboot-command 'growpart /dev/sda 3' --firstboot-command 'resize2fs /dev/sda3'
@@ -31,8 +34,7 @@ virt-customize -a "${VM_IMAGE}" --run-command '/setup.sh'
 virt-customize -a "${VM_IMAGE}" --run-command '/start-k3s.sh'
 virt-customize -a "${VM_IMAGE}" --run-command 'rm -rf /setup.sh /start-k3s.sh /etc/systemd/network/20-dhcp.network'
 
-echo "freeing space..."
-virt-sparsify --in-place "${VM_IMAGE}"
+virt-customize -a "${VM_IMAGE}" --run-command 'cloud-init clean'
 
 echo "compressing VM"
 gzip "${VM_IMAGE}"
