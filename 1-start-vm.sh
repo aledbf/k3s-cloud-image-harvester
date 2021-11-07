@@ -24,7 +24,7 @@ qemu-system-x86_64 \
   -m 16g \
   -nographic \
   -drive if=pflash,file=firmware-code-amd64.fd,format=raw,readonly=on \
-  -drive if=pflash,file=firmware-vars-amd64.fd,format=raw \
+  -drive if=pflash,file=firmware-vars-amd64.fd,format=raw,readonly=on \
   -drive if=virtio,file="${VM_IMAGE}",format=qcow2 \
   -drive file=user-data.img,format=raw \
   -netdev user,id=net0,hostfwd=tcp::2222-:22 \
